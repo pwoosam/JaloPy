@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from Adafruit_PCA9685 import PCA9685
 import time
 import getch
