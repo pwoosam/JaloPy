@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello World!</title>
+    <script src="http://cdn.peerjs.com/0.3.14/peer.js"></script>
+  </head>
+  <body>
+    <h1 id="h1Tag">Hello World!</h1>
+    <video id="videoStream"></video>
+
+  <script>
+    var peer = new Peer('rcvideo', {key: 'x69moa0odm18aor'});
+    var connections = [];
+    var h1Tag = document.querySelector('#h1Tag');
+    h1Tag.innerHTML = peer.id;
+
+    setInterval(function () {
+      if (!peer.open) {
+        peer = new Peer('rcvideo', {key: 'x69moa0odm18aor'});
+      }
+    }, 1000);
+
+    peer.on('connection', function (conn) {
+      h1Tag.innerHTML = ":(";
+      h1Tag.innerHTML = conn.peer + " has connected";
+      var video = document.querySelector('#videoStream');
+      connections.push(conn);
+      if (video.srcObject !== undefined) {
+        h1Tag.innerHTML = "I sent a stream to " + conn.peer;
+        peer.call(conn.peer, video.srcObject);
+      }
+    });
+
+
+    navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true
+    }).then(function (stream) {
+      var h1Tag = document.querySelector('#h1Tag');
+      h1Tag.innerHTML = "I should be streaming now!";
+      var video = document.querySelector('#videoStream');
+      video.srcObject = stream;
+      video.onloadedmetadata = function (e) {
+        video.play();
+      };
+      connections.forEach(function (conn) {
+        peer.call(conn.peer, stream);
+      });
+    });
+  </script>
+  </body>
+</html>
